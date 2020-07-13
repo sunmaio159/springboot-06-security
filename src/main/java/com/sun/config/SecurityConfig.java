@@ -19,7 +19,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/level2/**").hasRole("vip2")
                 .antMatchers("/level3/**").hasRole("vip3");
         //没有权限默认会到登录页面，需要开启登录的页面
-        http.formLogin();
+        http.formLogin().loginPage("/toLogin").loginProcessingUrl("/login");
+
+        http.csrf().disable();//关闭csrf功能
+        //注销，开启了注销功能
+        http.logout().logoutSuccessUrl("/");
+
+        http.rememberMe().rememberMeParameter("remerber");//开启记住我的功能，cookie,默认保存两周
     }
 
     //认证
@@ -29,10 +35,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         //这些数据正常从数据库中读
         auth.inMemoryAuthentication().passwordEncoder(new BCryptPasswordEncoder())
-                .withUser("sun").password(new BCryptPasswordEncoder().encode("123456")).roles("vip2","vip3")
+                .withUser("sun").password(new BCryptPasswordEncoder().encode("123")).roles("vip2","vip3")
                 .and()
-                .withUser("root").password(new BCryptPasswordEncoder().encode("123456")).roles("vip1","vip2","vip3")
+                .withUser("root").password(new BCryptPasswordEncoder().encode("123")).roles("vip1","vip2","vip3")
                 .and()
-                .withUser("guest").password(new BCryptPasswordEncoder().encode("123456")).roles("vip1");
+                .withUser("guest").password(new BCryptPasswordEncoder().encode("123")).roles("vip1");
     }
 }
